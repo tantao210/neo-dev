@@ -96,6 +96,9 @@ type TransactionResult struct {
 	SysFee string `json:"sys_fee"` // 系统费
 	NetFee string `json:"net_fee"` // 网络费
 	Scripts []*Witness `json:"scripts"` // 用于验证交易的脚本列表
+	Blockhash string `json:"blockhash"` // 区块 hash
+	Confirmations int64 `json:"confirmations"` // 验证次数
+	Blocktime int64 `json:"blocktime"` // 时间戳
 }
 
 // Witness 合约脚本
