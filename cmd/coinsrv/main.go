@@ -1,9 +1,9 @@
 package main
 
 import (
+	"flag"
 	"neo-dev/cmd/coinsrv/global"
 	"neo-dev/cmd/coinsrv/neoanderls"
-	"flag"
 	"neo-dev/configure"
 )
 
@@ -27,7 +27,6 @@ func init() {
 
 	flag.Parse()
 }
-
 
 func main() {
 	webapp, err := global.NewWebApp()

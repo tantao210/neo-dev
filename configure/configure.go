@@ -12,7 +12,7 @@ var (
 	//NotifyAddr 交易通知地址
 	NotifyAddr = "http://www.tigerft.com/fag/recv?service=deposit"
 	// StartNotify 是否启动通知
-	StartNotify bool 
+	StartNotify bool
 	// StartTxCallBack 是否启动通知
 	StartTxCallBack bool
 	// NotifyCoin 那些币种启动通知用逗号隔开 btc,eth,
@@ -20,8 +20,7 @@ var (
 	// EthSuccessNumber eth验证成功的区块数量
 	EthSuccessNumber int64 = 6
 	// IsProduce 是否是生产环境
-	IsProduce bool 
-
+	IsProduce bool
 )
 
 // NeoAsset NEO 资产类型

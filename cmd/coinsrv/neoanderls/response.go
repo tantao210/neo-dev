@@ -7,7 +7,7 @@ import (
 
 type failResponse struct {
 	Code string `json:"code"`
-	Msg string `json:"msg"`
+	Msg  string `json:"msg"`
 }
 
 type successResponse struct {

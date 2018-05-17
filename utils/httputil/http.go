@@ -1,18 +1,18 @@
 package httputil
 
 import (
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
-	"neo-dev/utils/errorutil"
 	"errors"
+	"io/ioutil"
+	"neo-dev/utils/errorutil"
+	"net/http"
 	"strings"
 	// "fmt"
 )
 
 var (
 	PostMethod = "POST"
-	GetMethod = "GET"
+	GetMethod  = "GET"
 )
 
 func BuildParams(params map[string]string) string {
@@ -26,14 +26,12 @@ func BuildParams(params map[string]string) string {
 	return args
 }
 
-
-
 func HTTPRequest(url string, method string, head map[string]string, data interface{}) ([]byte, error) {
 	client := &http.Client{}
-	var ( 
-		req *http.Request
+	var (
+		req     *http.Request
 		reqData []byte
-		err error
+		err     error
 	)
 	if method == PostMethod {
 		reqData, err = json.Marshal(data)

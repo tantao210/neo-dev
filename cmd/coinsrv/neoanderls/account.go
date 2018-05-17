@@ -1,15 +1,15 @@
 package neoanderls
 
 import (
-	"github.com/labstack/echo"
-	"neo-dev/utils/errorutil"
-	"neo-dev/utils/httputil"
-	"fmt"
-	"net/http"
-	"neo-dev/configure"
 	"encoding/json"
+	"fmt"
+	"github.com/labstack/echo"
 	"neo-dev/cmd/coinsrv/db"
 	"neo-dev/cmd/coinsrv/global"
+	"neo-dev/configure"
+	"neo-dev/utils/errorutil"
+	"neo-dev/utils/httputil"
+	"net/http"
 	"strconv"
 )
 
@@ -26,14 +26,14 @@ func Balance(ctx echo.Context) error {
 	neo.Params = make([]interface{}, 0)
 	// neo.Params =  append(neo.Params, "c56f33fc6ecfcd0c225c4ab356fee59390af8560be0e930faebe74a6daff7c9b") // NEO 资产
 	// neo.Params =  append(neo.Params, "602c79718b16e442de58778e148d0b1084e3b2dffd5de6b7b16cee7969282de7") // GAS 资产
-	neo.Params =  append(neo.Params, request.Address)
-	respData, err := httputil.HTTPRequest("http://" + configure.RPCAddr, httputil.PostMethod, nil, neo)
+	neo.Params = append(neo.Params, request.Address)
+	respData, err := httputil.HTTPRequest("http://"+configure.RPCAddr, httputil.PostMethod, nil, neo)
 	if err != nil {
 		// fmt.Println(err)
 		data, _ := FailResponse(errorutil.System_Error, err.Error())
 		return ctx.JSONBlob(http.StatusOK, data)
 	}
-	// rpc 返回结果说明 
+	// rpc 返回结果说明
 	/*
 		{
 			"jsonrpc": "2.0",
@@ -71,7 +71,7 @@ func Create(ctx echo.Context) error {
 	neo := NewNeoRequest()
 	neo.Method = "newaddress"
 	neo.Params = make([]interface{}, 0)
-	respData, err := httputil.HTTPRequest("http://" + configure.RPCAddr, httputil.PostMethod, nil, neo)
+	respData, err := httputil.HTTPRequest("http://"+configure.RPCAddr, httputil.PostMethod, nil, neo)
 	if err != nil {
 		// fmt.Println(err)
 		data, _ := FailResponse(errorutil.System_Error, err.Error())
@@ -105,8 +105,7 @@ func Create(ctx echo.Context) error {
 // TransactionInfoByHash 使用hash查询交易详情
 func TransactionInfoByHash(ctx echo.Context) error {
 	var (
-		
-		err error
+		err      error
 		response QueryTransactionResponse
 	)
 	request := new(QueryTransactionRequest)
@@ -119,15 +118,15 @@ func TransactionInfoByHash(ctx echo.Context) error {
 	neo := NewNeoRequest()
 	neo.Method = "getrawtransaction"
 	neo.Params = make([]interface{}, 0)
-	neo.Params = append(neo.Params, request.TXID, 1) 
-	respData, err := httputil.HTTPRequest("http://" + configure.RPCAddr, httputil.PostMethod, nil, neo)
+	neo.Params = append(neo.Params, request.TXID, 1)
+	respData, err := httputil.HTTPRequest("http://"+configure.RPCAddr, httputil.PostMethod, nil, neo)
 	if err != nil {
 		// fmt.Println(err)
 		data, _ := FailResponse(errorutil.System_Error, err.Error())
 		return ctx.JSONBlob(http.StatusOK, data)
 	}
 	// return ctx.JSONBlob(http.StatusOK, respData)
-	
+
 	// 保存交易信息
 	neoRespones := new(NeoResponse)
 	transactionResult := new(TransactionResult)
@@ -154,11 +153,11 @@ func TransactionInfoByHash(ctx echo.Context) error {
 	// response.GasPrice = transaction.GasLimit
 	data, _ := json.Marshal(response)
 	return ctx.JSONBlob(http.StatusOK, data)
-	
+
 }
 
 // SendTransaction 发起交易
-func SendTransaction(ctx echo.Context) error{
+func SendTransaction(ctx echo.Context) error {
 	var (
 		err error
 	)
@@ -171,13 +170,13 @@ func SendTransaction(ctx echo.Context) error{
 	if transaction.GetType() == "" {
 		err = fmt.Errorf("参数错误")
 		data, _ := FailResponse(errorutil.Network_Error, err.Error())
-		return ctx.JSONBlob(http.StatusOK, data) 
+		return ctx.JSONBlob(http.StatusOK, data)
 	}
 	neo := NewNeoRequest()
 	neo.Method = "sendfromto"
 	neo.Params = make([]interface{}, 0)
 	neo.Params = append(neo.Params, transaction.GetType(), transaction.From, transaction.To, transaction.Amount, transaction.Private)
-	respData, err := httputil.HTTPRequest("http://" + configure.RPCAddr, httputil.PostMethod, nil, neo)
+	respData, err := httputil.HTTPRequest("http://"+configure.RPCAddr, httputil.PostMethod, nil, neo)
 	if err != nil {
 		// fmt.Println(err)
 		data, _ := FailResponse(errorutil.System_Error, err.Error())
@@ -206,8 +205,8 @@ func SendTransaction(ctx echo.Context) error{
 	order.Amount = transaction.Amount
 	order.Type = transaction.Type
 	order.GasPrice = transaction.GasLimit
-	order.NetFee, _ =  strconv.ParseFloat(transactionResult.NetFee, 64)
-	order.SysFee, _ =  strconv.ParseFloat(transactionResult.SysFee, 64)
+	order.NetFee, _ = strconv.ParseFloat(transactionResult.NetFee, 64)
+	order.SysFee, _ = strconv.ParseFloat(transactionResult.SysFee, 64)
 	_, err = db.CreateTransaction(global.DB, order)
 	if err != nil {
 		err = fmt.Errorf("保存交易信息失败~%s", err)

@@ -1,19 +1,19 @@
 package global
 
 import (
-	"github.com/labstack/echo"
-	"github.com/jmoiron/sqlx"
-	"net/http"
 	"fmt"
-	"neo-dev/configure"
+	"github.com/jmoiron/sqlx"
+	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
+	"neo-dev/configure"
 	"neo-dev/utils/errorutil"
+	"net/http"
 )
 
 var (
 	WebApp *echo.Echo
-	DB *sqlx.DB
+	DB     *sqlx.DB
 )
 
 type CustomContext struct {
@@ -53,7 +53,7 @@ func NewWebApp() (*echo.Echo, error) {
 		WebApp.Logger.Fatal("连接数据库失败: ", err.Error())
 		return WebApp, err
 	}
-	WebApp.Use(func(h echo.HandlerFunc) echo.HandlerFunc{
+	WebApp.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			cc := &CustomContext{c, db}
 			return h(cc)
@@ -65,7 +65,7 @@ func NewWebApp() (*echo.Echo, error) {
 func httpErrorHandler(err error, c echo.Context) {
 	var (
 		code = http.StatusInternalServerError
-		msg interface{}
+		msg  interface{}
 	)
 	if he, ok := err.(*echo.HTTPError); ok {
 		code = he.Code

@@ -1,47 +1,53 @@
 package neoanderls
 
 import (
-	"testing"
-	"neo-dev/utils/httputil"
 	"encoding/json"
 	"neo-dev/cmd/coinsrv/db"
 	"neo-dev/cmd/coinsrv/global"
-	"fmt"
+	"neo-dev/utils/httputil"
 	"strconv"
+	"testing"
 	"time"
 )
+
+/**
+ * cmmand
+ * go test neo-dev\cmd\coinsrv\neoanderls -run TestNeo -timeout 20000s
+ *
+**/
 
 func TestCreate(t *testing.T) {
 
 }
 
+// TestNeo 测试创建账号 发起交易 查询余额 查询交易功能
 func TestNeo(t *testing.T) {
 	var (
 		// err error
-		host string
-		createUrl string
-		accountNum int // 创建账号的数量
-		neoAmount int // 转 neo 的数量
-		gasAmount float64 // 转 Gas 的数量
+		host        string
+		createUrl   string
+		accountNum  int     // 创建账号的数量
+		neoAmount   int     // 转 neo 的数量
+		gasAmount   float64 // 转 Gas 的数量
 		sendTranUrl string
-		balanceUrl string
-		getTxUrl string
-		header map[string]string
+		balanceUrl  string
+		getTxUrl    string
+		header      map[string]string
 	)
-	t.Errorf("调试过程的固定Error")
+	// t.Errorf("调试过程的固定Error")
 	// 初始化基本参数
 	host = `http://127.0.0.1:6000`
 	accountNum = 1
 	neoAmount = 1
 	gasAmount = 0.5
 	// 创建账号
-	createUrl = host  + `/neo/account/create`
+	createUrl = host + `/neo/account/create`
 	sendTranUrl = host + `/neo/trade/send`
 	balanceUrl = host + `/neo/account/query`
 	getTxUrl = host + `/neo/trade/query`
 	header = make(map[string]string)
 	header["Content-Type"] = "application/json"
-	for i := 0; i < accountNum; i ++ {
+	for i := 0; i < accountNum; i++ {
 		data, err := httputil.HTTPRequest(createUrl, httputil.PostMethod, header, nil)
 		if err != nil {
 			t.Errorf("请求创建账号服务失败~%s", err)
@@ -61,12 +67,12 @@ func TestNeo(t *testing.T) {
 			if address.Address == "" {
 				t.Errorf("创建账号不成功，账号信息为空~")
 			} else {
-				t.Logf("创建账号: %d/%d", i + 1, accountNum)
+				t.Logf("创建账号: %d/%d", i+1, accountNum)
 			}
 		}
 	}
 	t.Logf("已完成 [%d] 个账号的创建", accountNum)
-	
+
 	// 初始华数据库操作对象
 	global.NewWebApp()
 
@@ -83,10 +89,10 @@ func TestNeo(t *testing.T) {
 	}
 
 	// fmt.Println("开始交易 ", len(accountList))
-	
+
 	for i, account := range accountList {
-		t.Logf("发起交易: %d/%d", i + 1, len(accountList))
-		for tradeType := 1; tradeType < 3; tradeType ++ {
+		t.Logf("发起交易: %d/%d", i+1, len(accountList))
+		for tradeType := 1; tradeType < 3; tradeType++ {
 			tranReq := new(Transaction)
 			tranReq.Type = tradeType
 			tranReq.From = mainAccount.Address
@@ -131,11 +137,11 @@ func TestNeo(t *testing.T) {
 		}
 	}
 
-	fmt.Println("开始查询余额 ", len(accountList))
+	// fmt.Println("开始查询余额 ", len(accountList))
 	// 查询余额
 	for i, account := range accountList {
-		t.Logf("查询余额: %d / %d", i + 1, len(accountList))
-		balanceRequest := new (BalanceRequest)
+		t.Logf("查询余额: %d / %d", i+1, len(accountList))
+		balanceRequest := new(BalanceRequest)
 		balanceRequest.Address = account.Address
 		data, err := httputil.HTTPRequest(balanceUrl, httputil.PostMethod, header, balanceRequest)
 		if err != nil {
@@ -159,13 +165,13 @@ func TestNeo(t *testing.T) {
 		}
 	}
 	// 查询交易
-	fmt.Println("开始获取交易记录 ", len(accountList))
+	// fmt.Println("开始获取交易记录 ", len(accountList))
 	orderList, err := db.GetTransactionList(global.DB)
 	if err != nil {
 		t.Errorf("获取交易记录失败 ~ %s", err)
 	}
 	for i, order := range orderList {
-		t.Logf("查询交易: %d / %d", i + 1, len(orderList))
+		t.Logf("查询交易: %d / %d", i+1, len(orderList))
 		request := new(QueryTransactionRequest)
 		request.TXID = order.TXID
 		data, err := httputil.HTTPRequest(getTxUrl, httputil.PostMethod, header, request)
@@ -190,13 +196,14 @@ func TestNeo(t *testing.T) {
 	}
 }
 
+// TestCollect 归集所有账号的余额到主账号
 func TestCollect(t *testing.T) {
 	var (
 		// err error
-		host string
+		host        string
 		sendTranUrl string
-		balanceUrl string
-		header map[string]string
+		balanceUrl  string
+		header      map[string]string
 	)
 	t.Errorf("调试的固定Error")
 	// 初始化基本参数
@@ -218,8 +225,8 @@ func TestCollect(t *testing.T) {
 	}
 	// 查询余额
 	for i, account := range accountList {
-		t.Logf("查询余额: %d / %d", i + 1, len(accountList))
-		balanceRequest := new (BalanceRequest)
+		t.Logf("归集查询余额: %d / %d", i+1, len(accountList))
+		balanceRequest := new(BalanceRequest)
 		balanceRequest.Address = account.Address
 		data, err := httputil.HTTPRequest(balanceUrl, httputil.PostMethod, header, balanceRequest)
 		if err != nil {
@@ -300,5 +307,5 @@ func TestCollect(t *testing.T) {
 			}
 		}
 	}
+	t.Logf("归集完成")
 }
-
